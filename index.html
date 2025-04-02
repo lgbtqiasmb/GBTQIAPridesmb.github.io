@@ -214,17 +214,390 @@
         <h1>LGBTQIA+ Pride</h1>
         <p class="subtitle">Explore the beautiful diversity of gender identities and sexual orientations</p>
     </header>
-
-    <div class="search-box">
-        <input type="text" class="search-input" id="search-input" placeholder="Search any LGBTQIA+ identity (e.g. 'demigender')">
-        <button class="search-btn" onclick="searchIdentity()">
-            <span id="search-text">Search</span>
-            <span class="loader" id="search-loader"></span>
-        </button>
-    </div>
-
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>LGBTQIA+ Info Lookup</title>
+        <style>
+            body {
+                font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                text-align: center;
+                margin: 0;
+                padding: 50px 20px;
+                max-width: 800px;
+                margin-left: auto;
+                margin-right: auto;
+                background-color: #FFEBF7;
+                color: #333;
+            }
+            #info {
+                margin-top: 30px;
+                padding: 20px;
+                border: 2px solid #FF69B4;
+                border-radius: 20px;
+                text-align: left;
+                background-color: white;
+                box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+                line-height: 1.5;
+            }
+            img {
+                max-width: 200px;
+                margin-top: 15px;
+                border-radius: 10px;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            }
+            input, button {
+                padding: 12px 15px;
+                margin: 8px;
+                border-radius: 30px;
+                font-family: inherit;
+                font-size: 16px;
+            }
+            input {
+                width: 250px;
+                border: 2px solid #FFB6C1;
+                transition: all 0.3s;
+            }
+            input:focus {
+                outline: none;
+                border-color: #FF69B4;
+                box-shadow: 0 0 8px rgba(255, 105, 180, 0.5);
+            }
+            button {
+                background-color: #FF69B4;
+                color: white;
+                border: none;
+                cursor: pointer;
+                transition: all 0.3s;
+                font-weight: bold;
+            }
+            button:hover {
+                background-color: #FF1493;
+                transform: scale(1.05);
+            }
+            h1 {
+                color: #FF1493;
+                margin-bottom: 20px;
+                font-size: 2.2em;
+                text-shadow: 2px 2px 0px rgba(255, 105, 180, 0.2);
+            }
+            .random-button {
+                background-color: #9370DB;
+            }
+            .random-button:hover {
+                background-color: #7B68EE;
+            }
+            .api-button {
+                background-color: #20B2AA;
+            }
+            .api-button:hover {
+                background-color: #00CED1;
+            }
+            #loading {
+                display: none;
+                margin-top: 20px;
+                color: #FF69B4;
+                font-weight: bold;
+            }
+            .rainbow-bar {
+                height: 10px;
+                width: 100%;
+                background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+                margin-bottom: 25px;
+                border-radius: 5px;
+            }
+            #suggestions {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+                margin: 20px 0;
+            }
+            .suggestion-tag {
+                background-color: #FFC0CB;
+                padding: 8px 15px;
+                border-radius: 20px;
+                cursor: pointer;
+                transition: all 0.3s;
+                font-weight: bold;
+                color: #333;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .suggestion-tag:hover {
+                background-color: #FF69B4;
+                color: white;
+                transform: scale(1.1);
+            }
+            .container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .search-container {
+                margin-bottom: 20px;
+            }
+            .buttons-container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            strong {
+                color: #FF1493;
+            }
+            .hearts {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                font-size: 24px;
+                color: #FF69B4;
+            }
+            @keyframes float {
+                0% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+                100% { transform: translateY(0px); }
+            }
+            .floating {
+                animation: float 3s ease-in-out infinite;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="hearts">❤️ 🏳️‍🌈 ❤️</div>
+        <div class="rainbow-bar floating"></div>
+        <h1>✨ LGBTQIA+ Info Lookup ✨</h1>
+        
+        <div class="container">
+            <div class="search-container">
+                <input type="text" id="search" placeholder="Enter a term...">
+                <div class="buttons-container">
+                    <button onclick="lookupTerm()">🔍 Search</button>
+                    <button class="random-button" onclick="randomTerm()">🎲 Random Term</button>
+                    <button class="api-button" onclick="fetchFromAPI()">🌐 deep look</button>
+                </div>
+            </div>
+            
+            <div id="suggestions"></div>
+            <div id="loading">🔍 Searching external sources...</div>
+            <div id="info"></div>
+        </div>
+    
+        <script>
+            const lgbtqiaTerms = {
+                // Original terms
+                "lesbian": { "description": "A woman who is attracted to other women.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Lesbian_Pride_Flag_2019.svg/2560px-Lesbian_Pride_Flag_2019.svg.png" },
+                "gay": { "description": "A person who is attracted to others of the same gender, often used for men.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Gay_Pride_Flag.svg/2560px-Gay_Pride_Flag.svg.png" },
+                "bisexual": { "description": "A person who is attracted to both men and women.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Bisexual_Pride_Flag.svg/2560px-Bisexual_Pride_Flag.svg.png" },
+                "transgender": { "description": "A person whose gender identity is different from the sex assigned at birth.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Transgender_Pride_flag.svg/2560px-Transgender_Pride_flag.svg.png" },
+                "nonbinary": { "description": "A person whose gender identity doesn't fit within the traditional categories of male or female.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Nonbinary_Pride_Flag.svg/2560px-Nonbinary_Pride_Flag.svg.png" },
+                "agender": { "description": "A person who does not identify with any gender.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Agender_Pride_Flag.svg/2560px-Agender_Pride_Flag.svg.png" },
+                "genderqueer": { "description": "A person who identifies outside of the traditional gender binary.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Genderqueer_Pride_flag.svg/2560px-Genderqueer_Pride_flag.svg.png" },
+                "genderfluid": { "description": "A person whose gender identity shifts over time.", "flag": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Genderfluidity_Pride_Flag.png" },
+                "demiboy": { "description": "A person who partially, but not wholly, identifies as a man.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Demiboy_Pride_Flag.svg/2560px-Demiboy_Pride_Flag.svg.png" },
+                "demigirl": { "description": "A person who partially, but not wholly, identifies as a woman.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Demigirl_Pride_Flag.svg/2560px-Demigirl_Pride_Flag.svg.png" },
+                "androgyne": { "description": "A person who has a gender identity that is a mix of both male and female.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Androgyne_Pride_Flag.svg/2560px-Androgyne_Pride_Flag.svg.png" },
+                "neutrois": { "description": "A person who identifies as gender-neutral or genderless.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Neutrois_Pride_Flag.svg/2560px-Neutrois_Pride_Flag.svg.png" },
+                "polyamorous": { "description": "A person who engages in or is open to having multiple consensual relationships.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Polyamory_pride.svg/2560px-Polyamory_pride.svg.png" },
+                "graysexual": { "description": "A person who experiences sexual attraction infrequently or under specific circumstances.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Graysexual_Pride_Flag.svg/2560px-Graysexual_Pride_Flag.svg.png" },
+                "omnisexual": { "description": "A person who is attracted to all genders but may have preferences.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Omnisexual_Pride_Flag.svg/2560px-Omnisexual_Pride_Flag.svg.png" },
+                "demisexual": { "description": "A person who only experiences sexual attraction after forming an emotional bond.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Demisexual_Pride_Flag.svg/2560px-Demisexual_Pride_Flag.svg.png" },
+                "pansexual": { "description": "A person who is attracted to people regardless of their gender.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Pansexuality_Pride_Flag.svg/2560px-Pansexuality_Pride_Flag.svg.png" },
+                "asexual": { "description": "A person who experiences little or no sexual attraction to anyone.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Asexual_Pride_Flag.svg/2560px-Asexual_Pride_Flag.svg.png" },
+                "aromantic": { "description": "A person who experiences little or no romantic attraction to anyone.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Aromantic_Pride_Flag.svg/2560px-Aromantic_Pride_Flag.svg.png" },
+                "queer": { "description": "A person who doesn't identify as exclusively heterosexual or cisgender, used as an umbrella term.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Queer_Pride_Flag.svg/2560px-Queer_Pride_Flag.svg.png" },
+                "twospirit": { "description": "A term used by some Indigenous cultures to describe a person who embodies both masculine and feminine spirits.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Two-Spirit_Pride_Flag.svg/2560px-Two-Spirit_Pride_Flag.svg.png" },
+    
+                // Additional terms
+                "intersex": { "description": "A person born with sex characteristics that don't fit typical binary notions of male or female bodies.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Intersex_Pride_Flag.svg/2560px-Intersex_Pride_Flag.svg.png" },
+                "skoliosexual": { "description": "A person who is attracted to non-binary people or those who don't identify with the gender binary.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Skoliosexual_Pride_Flag.svg/2560px-Skoliosexual_Pride_Flag.svg.png" },
+                "pomosexual": { "description": "A person who rejects or doesn't fit into any sexual orientation label or categories.", "flag": "" },
+                "polysexual": { "description": "A person who is attracted to multiple, but not all, genders.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Polysexual_Pride_Flag.svg/2560px-Polysexual_Pride_Flag.svg.png" },
+                "bigender": { "description": "A person who experiences two gender identities, either simultaneously or varying between them.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Bigender_Pride_Flag.svg/2560px-Bigender_Pride_Flag.svg.png" },
+                "trigender": { "description": "A person who experiences three gender identities, either simultaneously or varying between them.", "flag": "" },
+                "pangender": { "description": "A person who identifies as all genders.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Pangender_pride_flag.svg/2560px-Pangender_pride_flag.svg.png" },
+                "abrosexual": { "description": "A person whose sexuality is fluid and changes over time.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Abrosexual_pride_flag.svg/2560px-Abrosexual_pride_flag.svg.png" },
+                "aegosexual": { "description": "A person who enjoys sexual fantasy or content but doesn't desire participation in the activities.", "flag": "" },
+                "alloromantic": { "description": "A person who experiences romantic attraction to others.", "flag": "" },
+                "allosexual": { "description": "A person who experiences sexual attraction, contrasted with asexual.", "flag": "" },
+                "ambiamorous": { "description": "A person who can be satisfied in either monogamous or polyamorous relationships.", "flag": "" },
+                "androsexual": { "description": "A person who is attracted to masculinity regardless of gender.", "flag": "" },
+                "autosexual": { "description": "A person who is sexually attracted to themselves.", "flag": "" },
+                "biromantic": { "description": "A person who is romantically attracted to two or more genders.", "flag": "" },
+                "ceterosexual": { "description": "A non-binary person who is attracted to non-binary people.", "flag": "" },
+                "cisgender": { "description": "A person whose gender identity aligns with their sex assigned at birth.", "flag": "" },
+                "cupiosexual": { "description": "An asexual person who desires a sexual relationship despite not experiencing sexual attraction.", "flag": "" },
+                "diamoric": { "description": "Describes non-binary people's attraction to a specific gender.", "flag": "" },
+                "demiromantic": { "description": "A person who only experiences romantic attraction after forming an emotional bond.", "flag": "" },
+                "dyadic": { "description": "A person born with sex characteristics that fit binary definitions of male or female bodies.", "flag": "" },
+                "finromantic": { "description": "A person who experiences romantic attraction but doesn't pursue romantic relationships.", "flag": "" },
+                "finsexual": { "description": "A person who is attracted to those who are feminine in nature.", "flag": "" },
+                "gynesexual": { "description": "A person who is attracted to femininity regardless of gender.", "flag": "" },
+                "heteroflexible": { "description": "A person who is primarily heterosexual but occasionally experiences same-sex attraction.", "flag": "" },
+                "homoflexible": { "description": "A person who is primarily homosexual but occasionally experiences attraction to other genders.", "flag": "" },
+                "lithromantic": { "description": "A person who experiences romantic attraction but doesn't desire reciprocation.", "flag": "" },
+                "maverique": { "description": "A specific non-binary gender identity characterized by autonomy and inner conviction about one's gender.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Maverique_Pride_Flag.svg/2560px-Maverique_Pride_Flag.svg.png" },
+                "minsexual": { "description": "A person who is attracted to masculinity in nature.", "flag": "" },
+                "monosexual": { "description": "A person who is attracted to only one gender.", "flag": "" },
+                "multisexual": { "description": "A person who is attracted to two or more genders.", "flag": "" },
+                "novosexual": { "description": "A person whose sexuality changes with their gender identity changes.", "flag": "" },
+                "omnigender": { "description": "A person who experiences all genders.", "flag": "" },
+                "panromantic": { "description": "A person who is romantically attracted to others regardless of their gender.", "flag": "" },
+                "polyaffectionate": { "description": "A person who desires multiple intimate but not necessarily sexual or romantic relationships.", "flag": "" },
+                "polygender": { "description": "A person who experiences multiple gender identities.", "flag": "" },
+                "reciprosexual": { "description": "A person who only experiences sexual attraction to someone after knowing that person is attracted to them.", "flag": "" },
+                "sapiosexual": { "description": "A person who is attracted to intelligence and its application.", "flag": "" },
+                "spectrasexual": { "description": "A person who is attracted to a broad spectrum of genders and sexes.", "flag": "" },
+                "transfeminine": { "description": "A transgender person who was assigned male at birth and identifies more with femininity.", "flag": "" },
+                "transmasculine": { "description": "A transgender person who was assigned female at birth and identifies more with masculinity.", "flag": "" },
+                "transneutral": { "description": "A transgender person who identifies with a neutral or null gender.", "flag": "" },
+                "xenogender": { "description": "Gender identities that cannot be contained by human understandings of gender.", "flag": "" },
+                "questioning": { "description": "A person who is uncertain or exploring their sexual orientation or gender identity.", "flag": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Questioning_Pride_Flag.svg/2560px-Questioning_Pride_Flag.svg.png" },
+                "femme": { "description": "A queer person who presents and identifies with femininity.", "flag": "" },
+                "butch": { "description": "A queer person who presents and identifies with masculinity, traditionally associated with lesbian culture.", "flag": "" },
+                "stud": { "description": "A term used primarily by Black lesbians to describe a masculine of center gender presentation.", "flag": "" },
+                "stem": { "description": "A person who is a blend of stud and femme, expressing both masculine and feminine characteristics.", "flag": "" }
+            };
+    
+            // Common abbreviations and slang terms
+            const slangToFull = {
+                "trans": "transgender",
+                "les": "lesbian",
+                "bi": "bisexual",
+                "nb": "nonbinary",
+                "enby": "nonbinary",
+                "ace": "asexual",
+                "aro": "aromantic",
+                "pan": "pansexual",
+                "poly": "polyamorous",
+                "polysex": "polysexual",
+                "gq": "genderqueer",
+                "gf": "genderfluid",
+                "inter": "intersex",
+                "qt": "queer",
+                "sapphic": "lesbian",
+                "bi-curious": "questioning",
+                "bicurious": "questioning",
+                "aspec": "asexual",
+                "aroace": "aromantic",
+                "t4t": "transgender",
+                "agab": "transgender",
+                "amab": "transgender",
+                "afab": "transgender",
+                "cis": "cisgender",
+                "demi": "demisexual",
+                "multisex": "multisexual",
+                "omni": "omnisexual",
+                "transfem": "transfeminine",
+                "transmasc": "transmasculine",
+                "2s": "twospirit"
+            };
+    
+            // Populate some suggested terms
+            const suggestedTerms = ["lesbian", "nonbinary", "pansexual", "transgender", "asexual", "genderfluid"];
+            const suggestionsDiv = document.getElementById("suggestions");
+            suggestedTerms.forEach(term => {
+                const tag = document.createElement("span");
+                tag.className = "suggestion-tag";
+                tag.textContent = term;
+                tag.onclick = () => {
+                    document.getElementById("search").value = term;
+                    lookupTerm();
+                };
+                suggestionsDiv.appendChild(tag);
+            });
+    
+            function lookupTerm() {
+                let term = document.getElementById("search").value.toLowerCase().trim();
+                const infoDiv = document.getElementById("info");
+                
+                // Always display the info div (even when empty)
+                infoDiv.style.display = "block";
+    
+                // If slang term is used, convert to full term
+                if (slangToFull[term]) {
+                    term = slangToFull[term];
+                }
+    
+                if (lgbtqiaTerms[term]) {
+                    let content = `<strong>${term.charAt(0).toUpperCase() + term.slice(1)}</strong>: ${lgbtqiaTerms[term].description}`;
+                    if (lgbtqiaTerms[term].flag && lgbtqiaTerms[term].flag !== "") {
+                        content += `<br><img src="${lgbtqiaTerms[term].flag}" alt="${term} pride flag">`;
+                    }
+                    infoDiv.innerHTML = content;
+                } else if (term) {
+                    // If not found locally, let user know they can try the API
+                    infoDiv.innerHTML = `<strong>Term not found</strong> 😕<br>Try clicking "Try External API" to search external sources!`;
+                } else {
+                    infoDiv.innerHTML = `<strong>Welcome!</strong> 💖<br>Enter a term above or click a suggestion to learn more!`;
+                }
+            }
+    
+            function randomTerm() {
+                const terms = Object.keys(lgbtqiaTerms);
+                const randomTerm = terms[Math.floor(Math.random() * terms.length)];
+                document.getElementById("search").value = randomTerm;
+                lookupTerm();
+            }
+    
+            // Urban Dictionary API call (does not require API key)
+            function fetchFromAPI() {
+                const term = document.getElementById("search").value.toLowerCase().trim();
+                if (!term) {
+                    alert("Please enter a term to search");
+                    return;
+                }
+    
+                const infoDiv = document.getElementById("info");
+                const loadingDiv = document.getElementById("loading");
+                loadingDiv.style.display = "block";
+    
+                // Using Urban Dictionary's API which doesn't require an API key
+                fetch(`https://api.urbandictionary.com/v0/define?term=${encodeURIComponent(term)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        loadingDiv.style.display = "none";
+                        if (data.list && data.list.length > 0) {
+                            // Get the first definition
+                            const definition = data.list[0].definition
+                                .replace(/\[|\]/g, '') // Remove Urban Dictionary's square brackets
+                                .replace(/[\r\n]+/g, '<br>'); // Replace newlines with HTML breaks
+    
+                            infoDiv.innerHTML = `
+                                <strong>External Definition for "${term}":</strong><br>
+                                <p>${definition}</p>
+                                <em>Note: This definition is from Urban Dictionary and may not be specifically LGBTQIA+ related.</em>
+                            `;
+                        } else {
+                            infoDiv.innerHTML = `<strong>No external definition found</strong> 😢<br>for "${term}".`;
+                        }
+                    })
+                    .catch(error => {
+                        loadingDiv.style.display = "none";
+                        infoDiv.innerHTML = `<strong>Error searching external API</strong> 😢<br>${error.message}`;
+                    });
+            }
+    
+            // Allow search when Enter key is pressed
+            document.getElementById("search").addEventListener("keyup", function(event) {
+                if (event.key === "Enter") {
+                    lookupTerm();
+                }
+            });
+    
+            // Automatically display random term on page load
+            window.onload = function() {
+                randomTerm();
+            };
+            
+            // Set default message in info div so it's always visible
+            document.getElementById("info").innerHTML = "<strong>Welcome!</strong> 💖<br>Enter a term above or click a suggestion to learn more!";
+            document.getElementById("info").style.display = "block";
+        </script>
+    </body>
+    </html>
     <div class="search-results" id="search-results"></div>
-
     <div class="flags-container" id="flags-container">
         <!-- Flags will be populated by JavaScript -->
     </div>
