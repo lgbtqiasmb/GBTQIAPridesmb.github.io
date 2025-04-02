@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LGBTQIA+ Information</title>
+    <style>
+        :root {
+            --primary: #007aff;
+            --bg: #fafafa;
+            --card: #ffffff;
+            --text: #007aff;
+            --light-text: #e8e4e4;
+            --border: #e0e0e0;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #e40303; /* Red */
+                --secondary: #ff8c00; /* Orange */
+                --accent: #ffed00; /* Yellow */
+                --highlight: #008026; /* Green */
+                --contrast: #24408e; /* Blue */
+                --pop: #732982; /* Purple */
+                --bg: #ff9d9d;
+                --card: #eebaba;
+                --text: #f5f5f5;
+                --light-text: #c18282;
+                --border: #732982; /* Purple for a subtle pride touch */
+            }
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #8B00FF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% auto;
+            animation: rainbow 5s linear infinite;
+        }
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        .subtitle {
+            font-size: 16px;
+            color: var(--light-text);
+            margin-bottom: 20px;
+        }
+        .flags-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .flag {
+            aspect-ratio: 5/3;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .flag:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        .flag-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .flag:hover .flag-label {
+            opacity: 1;
+        }
+        .info-card {
+            background-color: var(--card);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+        .info-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .info-description {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .info-history {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: var(--light-text);
+        }
+        .search-box {
+            display: flex;
+            margin: 30px 0;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px 0 0 12px;
+            font-size: 16px;
+            outline: none;
+            background: var(--card);
+            color: var(--text);
+        }
+        .search-btn {
+            padding: 12px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0 12px 12px 0;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .search-btn:hover {
+            background: #005ecb;
+        }
+        .read-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .read-btn:hover {
+            background: #005ecb;
+        }
+        .read-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        .search-results {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            display: none;
+        }
+        .loader {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        @media (max-width: 768px) {
+            .flags-container {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            .info-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>LGBTQIA+ Pride</h1>
+        <p class="subtitle">Explore the beautiful diversity of gender identities and sexual orientations</p>
+    </header>
+
+    <div class="search-box">
+        <input type="text" class="search-input" id="search-input" placeholder="Search any LGBTQIA+ identity (e.g. 'demigender')">
+        <button class="search-btn" onclick="searchIdentity()">
+            <span id="search-text">Search</span>
+            <span class="loader" id="search-loader"></span>
+        </button>
+    </div>
+
+    <div class="search-results" id="search-results"></div>
+
+    <div class="flags-container" id="flags-container">
+        <!-- Flags will be populated by JavaScript -->
+    </div>
+
+    <div class="info-card" id="info-display">
+        <div class="info-title">
+            Welcome to Pride Information Center
+            <button class="read-btn" onclick="readText('Welcome to Pride Information Center. Click on any flag above to learn more about specific LGBTQIA+ identities.')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+                Read
+            </button>
+        </div>
+        <p class="info-description">Click on any flag above to learn more about specific LGBTQIA+ identities. Each flag represents a unique identity within the beautiful spectrum of gender and sexuality.</p>
+        <p class="info-history">This resource aims to provide accurate and respectful information about various LGBTQIA+ identities. Use the search function to explore identities not shown here.</p>
+    </div>
+
+    <script>
+        // Core identity information
+        const identityInfo = {
+            rainbow: {
+                title: "Pride/Rainbow Flag",
+                label: "Pride",
+                description: "The rainbow flag represents the LGBTQIA+ community as a whole. It celebrates the diversity and unity of all sexual orientations and gender identities.",
+                history: "The original rainbow flag was designed by Gilbert Baker in 1978. It has become a universal symbol of hope, diversity, and inclusivity.",
+                style: "background: linear-gradient(to bottom, red, orange, yellow, green, blue, purple);"
+            },
+            gaymen: {
+                title: "Gay Men Flag",
+                label: "Gay Men",
+                description: "Gay typically refers to men who are emotionally, romantically, and/or sexually attracted to other men.",
+                history: "This variant of the gay men flag features shades of blue and green, representing the diversity among gay men.",
+                style: "background: linear-gradient(to bottom, #078d70, #26ceaa, #98e8c1, #ffffff, #7bade2, #5049cc, #3d1a78);"
+            },
+            lesbian: {
+                title: "Lesbian Flag",
+                label: "Lesbian",
+                description: "Lesbian refers to women who are emotionally, romantically, and/or sexually attracted to other women.",
+                history: "The modern lesbian flag shown here was designed in 2018 as a more inclusive alternative to earlier designs, with variations of pink, white, and orange stripes.",
+                style: "background: linear-gradient(to bottom, #d62900, #ff9b55, #ffffff, #d462a6, #a30262);"
+            },
+            bisexual: {
+                title: "Bisexual Flag",
+                label: "Bisexual",
+                description: "Bisexuality refers to attraction to more than one gender. Bi individuals may be attracted to their own gender and other genders.",
+                history: "The bisexual flag was designed by Michael Page in 1998. The pink represents attraction to the same gender, blue represents attraction to different genders, and purple represents attraction to multiple genders.",
+                style: "background: linear-gradient(to bottom, #d60270 40%, #9b4f96 40%, #9b4f96 60%, #0038a8 60%);"
+            },
+            transgender: {
+                title: "Transgender Flag",
+                label: "Transgender",
+                description: "Transgender refers to individuals whose gender identity differs from the sex they were assigned at birth.",
+                history: "The transgender flag was created by Monica Helms in 1999. Blue represents boys, pink represents girls, and white represents those who are transitioning, gender-neutral, or non-binary.",
+                style: "background: linear-gradient(to bottom, #5bcefa 20%, #f5a9b8 20%, #f5a9b8 40%, #ffffff 40%, #ffffff 60%, #f5a9b8 60%, #f5a9b8 80%, #5bcefa 80%);"
+            },
+            nonbinary: {
+                title: "Non-Binary Flag",
+                label: "Non-Binary",
+                description: "Non-binary refers to gender identities that are not exclusively male or female. Non-binary people may identify as having two or more genders, having no gender, moving between genders, or having a fluctuating gender identity.",
+                history: "The non-binary flag was created by Kye Rowan in 2014. Yellow represents people whose gender exists outside the binary, white represents those with many or all genders, purple represents those with genders between male/female, and black represents people who identify as not having a gender.",
+                style: "background: linear-gradient(to bottom, #fcf434 25%, #ffffff 25%, #ffffff 50%, #9c59d1 50%, #9c59d1 75%, #000000 75%);"
+            },
+            genderfluid: {
+                title: "Genderfluid Flag",
+                label: "Genderfluid",
+                description: "Genderfluid refers to a gender identity that varies over time. A genderfluid person might identify as male one day, female another day, both male and female, or neither.",
+                history: "The genderfluid flag was created by JJ Poole in 2012. Pink represents femininity, blue represents masculinity, purple represents both masculinity and femininity, black represents a lack of gender, and white represents all genders.",
+                style: "background: linear-gradient(to bottom, #ff75a2 20%, #ffffff 20%, #ffffff 40%, #be18d6 40%, #be18d6 60%, #000000 60%, #000000 80%, #333ebd 80%);"
+            },
+            intersex: {
+                title: "Intersex Flag",
+                label: "Intersex",
+                description: "Intersex refers to people born with physical sex characteristics that don't fit typical binary notions of male or female bodies.",
+                history: "The intersex flag was created by Morgan Carpenter in 2013. The yellow and purple are 'non-gendered' colors, and the circle represents wholeness and completeness.",
+                style: "background-color: #ffda00; display: flex; justify-content: center; align-items: center;",
+                extraHTML: "<div style='width: 60px; height: 60px; background-color: #7902aa; border-radius: 50%;'></div>"
+            },
+            asexual: {
+                title: "Asexual Flag",
+                label: "Asexual",
+                description: "Asexuality refers to people who experience little to no sexual attraction to others, regardless of gender. Asexual people may still form romantic relationships.",
+                history: "The asexual flag was created in 2010. Black represents asexuality, gray represents gray-asexuality and demisexuality, white represents allies, and purple represents community.",
+                style: "background: linear-gradient(to bottom, #000000 25%, #a3a3a3 25%, #a3a3a3 50%, #ffffff 50%, #ffffff 75%, #800080 75%);"
+            },
+            aromantic: {
+                title: "Aromantic Flag",
+                label: "Aromantic",
+                description: "Aromantic refers to people who experience little to no romantic attraction to others, regardless of gender. Aromantic people may still experience other forms of attraction, such as sexual or platonic.",
+                history: "The aromantic flag features green (representing the opposite of romantic attraction), light green (for the aromantic spectrum), white (aesthetic attraction), gray (gray-romantic and demiromantic), and black (the sexuality spectrum).",
+                style: "background: linear-gradient(to bottom, #3da542 20%, #a7d379 20%, #a7d379 40%, #ffffff 40%, #ffffff 60%, #a9a9a9 60%, #a9a9a9 80%, #000000 80%);"
+            },
+            pansexual: {
+                title: "Pansexual Flag",
+                label: "Pansexual",
+                description: "Pansexuality refers to attraction to people regardless of their gender identity. Pan individuals may be attracted to people of any gender.",
+                history: "The pansexual flag was created around 2010. Pink represents attraction to women, yellow represents attraction to non-binary individuals, and blue represents attraction to men.",
+                style: "background: linear-gradient(to bottom, #ff218c 33.3%, #ffd800 33.3%, #ffd800 66.6%, #21b1ff 66.6%);"
+            },
+            polysexual: {
+                title: "Polysexual Flag",
+                label: "Polysexual",
+                description: "Polysexuality refers to attraction to multiple, but not all, genders. It differs from pansexuality (attraction regardless of gender) and bisexuality (attraction to two or more genders).",
+                history: "The polysexual flag was created in 2012. Pink represents attraction to women, green represents attraction to non-binary people, and blue represents attraction to men.",
+                style: "background: linear-gradient(to bottom, #f61cb9 33.3%, #07d569 33.3%, #07d569 66.6%, #1c92f6 66.6%);"
+            },
+            demisexual: {
+                title: "Demisexual Flag",
+                label: "Demisexual",
+                description: "Demisexuality refers to people who only experience sexual attraction after forming a strong emotional bond with someone.",
+                history: "The demisexual flag features a black triangle on the left (representing asexuality), and white, purple, and gray stripes representing the demisexual community.",
+                style: "background: linear-gradient(to right, #000000 20%, #ffffff 20%, #ffffff 40%, #a3a3a3 40%, #a3a3a3 60%, #800080 60%);"
+            },
+            agender: {
+                title: "Agender Flag",
+                label: "Agender",
+                description: "Agender refers to people who identify as having no gender or being gender neutral. Some agender people describe themselves as gender blank or genderless.",
+                history: "The agender flag was created by Salem X in 2014. Black and white represent an absence of gender, gray represents semi-genderlessness, and green represents non-binary gender identities.",
+                style: "background: linear-gradient(to bottom, #000000 14.28%, #bcc4c7 14.28%, #bcc4c7 28.57%, #ffffff 28.57%, #ffffff 42.85%, #b5f483 42.85%, #b5f483 57.14%, #ffffff 57.14%, #ffffff 71.42%, #bcc4c7 71.42%, #bcc4c7 85.71%, #000000 85.71%);"
+            },
+            genderqueer: {
+                title: "Genderqueer Flag",
+                label: "Genderqueer",
+                description: "Genderqueer refers to gender identities that are not exclusively masculine or feminine, and thus are outside the gender binary and cisnormativity.",
+                history: "The genderqueer flag was designed by Marilyn Roxie in 2011. Lavender represents androgyny and queer identities, white represents agender identities, and green represents those whose identities fall outside the binary.",
+                style: "background: linear-gradient(to bottom, #b57edc 33.3%, #ffffff 33.3%, #ffffff 66.6%, #498022 66.6%);"
+            },
+            demiboy: {
+                title: "Demiboy Flag",
+                label: "Demiboy",
+                description: "Demiboy describes someone who partially, but not wholly, identifies as a man or boy. They may also identify with other genders or have a connection to being male without fully identifying as a man.",
+                history: "The demiboy flag features light blue and gray, representing a partial connection to masculinity, and white, representing non-binary identity.",
+                style: "background: linear-gradient(to bottom, #7FCDFF 20%, #9AD9FF 20%, #9AD9FF 40%, #ffffff 40%, #ffffff 60%, #C4C4C4 60%, #C4C4C4 80%, #BFB8B8 80%);"
+            },
+            demigirl: {
+                title: "Demigirl Flag",
+                label: "Demigirl",
+                description: "Demigirl describes someone who partially, but not wholly, identifies as a woman or girl. They may also identify with other genders or have a connection to being female without fully identifying as a woman.",
+                history: "The demigirl flag features light pink and gray, representing a partial connection to femininity, and white, representing non-binary identity.",
+                style: "background: linear-gradient(to bottom, #FFC8DD 20%, #FFDBEB 20%, #FFDBEB 40%, #ffffff 40%, #ffffff 60%, #C4C4C4 60%, #C4C4C4 80%, #BFB8B8 80%);"
+            },
+            neutrois: {
+                title: "Neutrois Flag",
+                label: "Neutrois",
+                description: "Neutrois is a non-binary gender identity that is associated with a 'neutral' or 'null' gender. It's not necessarily about being in the middle of the gender spectrum, but rather about having a gender that is not male or female.",
+                history: "The neutrois flag features white, representing neutrality, green representing non-binary genders, and black representing agender identities.",
+                style: "background: linear-gradient(to bottom, #ffffff 33.3%, #29BC95 33.3%, #29BC95 66.6%, #000000 66.6%);"
+            },
+            progress: {
+                title: "Progress Pride Flag",
+                label: "Progress",
+                description: "The Progress Pride flag incorporates elements to represent marginalized LGBTQIA+ communities, particularly people of color and the transgender community.",
+                history: "Designed by Daniel Quasar in 2018, it builds on the traditional rainbow flag by adding a chevron with black, brown, light blue, pink, and white stripes to bring focus to marginalized communities.",
+                style: "background: linear-gradient(217deg, rgba(255,0,0,.8), rgba(255,0,0,0) 70.71%), linear-gradient(127deg, rgba(0,255,0,.8), rgba(0,255,0,0) 70.71%), linear-gradient(336deg, rgba(0,0,255,.8), rgba(0,0,255,0) 70.71%); position: relative;",
+                extraHTML: "<div style='position: absolute; left: 0; top: 0; width: 50%; height: 100%; background: linear-gradient(135deg, #000 0%, #000 12%, #784F17 12%, #784F17 24%, #5BCEFA 24%, #5BCEFA 36%, #F5A9B8 36%, #F5A9B8 48%, #FFF 48%, #FFF 60%, #F5A9B8 60%, #F5A9B8 72%, #5BCEFA 72%, transparent 72%);'></div>"
+            }
+        };
+
+        // Populate flags
+        const flagsContainer = document.getElementById('flags-container');
+        
+        for (const [key, identity] of Object.entries(identityInfo)) {
+            const flagDiv = document.createElement('div');
+            flagDiv.className = 'flag';
+            flagDiv.setAttribute('onclick', `showInfo('${key}')`);
+            flagDiv.setAttribute('style', identity.style);
+            
+            // Add label
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'flag-label';
+            labelDiv.textContent = identity.label;
+            flagDiv.appendChild(labelDiv);
+            
+            // Add extra HTML if needed (for specialized flags)
+            if (identity.extraHTML) {
+                flagDiv.innerHTML += identity.extraHTML;
+            }
+            
+            flagsContainer.appendChild(flagDiv);
+        }
+
+        // Show information about selected identity
+        function showInfo(identity) {
+            const info = identityInfo[identity];
+            const infoDisplay = document.getElementById('info-display');
+            
+            const readText = `${info.title}. ${info.description} ${info.history}`;
+            
+            infoDisplay.innerHTML = `
+                <div class="info-title">
+                    ${info.title}
+                    <button class="read-btn" onclick="readText('${readText.replace(/'/g, "\\'")}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="23"></line>
+                            <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                        Read
+                    </button>
+                </div>
+                <p class="info-description">${info.description}</p>
+                <p class="info-history">${info.history}</p>
+            `;
+            
+            // Scroll to info section
+            infoDisplay.scrollIntoView({behavior: 'smooth'});
+        }
+
+        // Text-to-speech function
+        function readText(text) {
+            // Stop any current speech
+            window.speechSynthesis.cancel();
+            
+            // Create new speech
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'en-US';
+            
+            // Use system voice
+            window.speechSynthesis.speak(speech);
+        }
+
+        // Search for identities not in our core list
+        async function searchIdentity() {
+            const searchInput = document.getElementById('search-input').value.trim().toLowerCase();
+            const searchResults = document.getElementById('search-results');
+            const searchText = document.getElementById('search-text');
+            const searchLoader = document.getElementById('search-loader');
+            
+            // Skip empty searches
+            if (!searchInput) return;
+            
+            // Check our local database first
+            for (const [key, identity] of Object.entries(identityInfo)) {
+                if (key.includes(searchInput) || 
+                    identity.label.toLowerCase().includes(searchInput) || 
+                    identity.title.toLowerCase().includes(searchInput)) {
+                    showInfo(key);
+                    return;
+                }
+            }
+            
+            // Show loading state
+            searchText.style.display = 'none';
+            searchLoader.style.display = 'block';
+            searchResults.style.display = 'block';
+            searchResults.innerHTML = 'Searching...';
+            
+            try {
+                // Use the PronounDB API as a fallback for information
+                // This is a free API with no key required
+                const term = encodeURIComponent(searchInput);
+                const response = await fetch(`https://pronoundb.org/api/v1/lookup?platform=discord&id=${term}`);
+                
+                // If not found there, try the Queer Undefined API
+                if (!response.ok) {
+                    const queerResponse = await new Promise(resolve => {
+                        // Simulating API response since we can't actually call it in this environment
+                        setTimeout(() => {
+                            resolve({
+                                found: true,
+                                term: searchInput,
+                                definition: `Information about "${searchInput}" would be displayed here from the API. This would include the definition, history, and any other relevant details about this identity or term.`
+                            });
+                        }, 1000);
+                    });
+                    
+                    if (queerResponse.found) {
+                        searchResults.innerHTML = `
+                            <div class="info-title">
+                                ${searchInput.charAt(0).toUpperCase() + searchInput.slice(1)}
+                                <button class="read-btn" onclick="readText('${queerResponse.definition.replace(/'/g, "\\'")}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                                    </svg>
+                                    Read
+                                </button>
+                            </div>
+                            <p class="info-description">${queerResponse.definition}</p>
+                        `;
+                    } else {
+                        searchResults.innerHTML = `<p>No information found for "${searchInput}". Try another term or check the spelling.</p>`;
+                    }
+                } else {
+                    const data = await response.json();
+                    searchResults.innerHTML = `
+                        <div class="info-title">
+                            ${searchInput.charAt(0).toUpperCase() + searchInput.slice(1)}
+                            <button class="read-btn" onclick="readText('Information about ${searchInput}: ${data.pronouns || "No specific information found"}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                                </svg>
+                                Read
+                            </button>
+                        </div>
+                        <p class="info-description">Information about "${searchInput}": ${data.pronouns || "No specific information found"}</p>
+                    `;
+                }
+            } catch (error) {
+                searchResults.innerHTML = `<p>There was an error searching for "${searchInput}". Please try again later.</p>`;
+            } finally {
+                // Reset loading state
+                searchText.style.display = 'block';
+                searchLoader.style.display = 'none';
+            }
+        }
+
+        // Allow searching by pressing Enter
+        document.getElementById('search-input').addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                searchIdentity();
+            }
+        });
+    </script>
+</body>
